@@ -17,66 +17,76 @@ import tensorflow as tf
 del os.environ['TCL_LIBRARY']
 
 
-def get_linear_samples():
-    x = np.random.uniform(high=10, low=0, size=100)
-    y = 3.5 * x - 4 + np.random.normal(loc=0, scale=2, size=100)
+def get_linear_samples(n_samples=100):
+    x = np.random.uniform(high=10, low=0, size=n_samples)
+    y = 3.5 * x - 4 + np.random.normal(loc=0, scale=2, size=n_samples)
     return x, y
 
 
-x_train, y_train = get_linear_samples()
+# Parameters
+num_epochs = 1000
+num_samples = 100
+learning_rate = 0.01
+
+x_train, y_train = get_linear_samples(num_samples)
 
 # Graph input
-X = tf.placeholder(dtype=tf.float32, shape=100)
-Y = tf.placeholder(dtype=tf.float32, shape=100)
+X = tf.placeholder(dtype=tf.float32, shape=num_samples)
+Y = tf.placeholder(dtype=tf.float32, shape=num_samples)
 
-W = tf.Variable(1.0)
-c = tf.Variable(1.0)
+# Parameters to be learned
+W = tf.Variable(1.0, name="weight")
+b = tf.Variable(1.0, name="bias")
 
-# Define hypothesis
-Ypred = tf.matmul(W, X) + c
+# Construct a linear model (Hypothesis)
+# h = WX +b
+h = tf.add(tf.multiply(X, W), b)
 
 # Define loss function (RMSE)
-loss = tf.reduce_mean(tf.square(Ypred - Y))
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=.001)
+loss = tf.reduce_mean(tf.square(h - Y))
+
+# Gradient descent optimizer
+optimizer = tf.train.GradientDescentOptimizer(learning_rate)
 train = optimizer.minimize(loss)
 init = tf.global_variables_initializer()
 with tf.Session() as session:
     session.run(init)
     steps = dict()
-    steps['m'] = []
-    steps['c'] = []
+    steps['W'] = []
+    steps['b'] = []
 
     losses = []
 
-    for k in range(1000):
-        _m = session.run(W)
-
-        _c = session.run(c)
+    for k in range(num_epochs):
+        _W = session.run(W)
+        _b = session.run(b)
         _l = session.run(loss, feed_dict={X: x_train, Y: y_train})
         session.run(train, feed_dict={X: x_train, Y: y_train})
-        steps['m'].append(_m)
-        steps['c'].append(_c)
+
+        # Store learned params for plotting
+        steps['W'].append(_W)
+        steps['b'].append(_b)
         losses.append(_l)
 
         print("Current loss: %s" % _l)
 
-# Plot loss
-plt.figure(1)
-plt.subplot(211)
-plt.plot(losses)
-plt.xlabel('epoch')
-plt.ylabel('loss')
-plt.tight_layout()
+    # Plot loss
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(losses)
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.tight_layout()
 
-w= steps['m'][-1]
-b=steps['c'][-1]
-estimated_y = w * x_train + b
+    # This is the learned regression line
+    learned_w = session.run(W)
+    learned_b = session.run(b)
+    regression_line = learned_w * x_train + learned_b
 
-plt.subplot(212)
-plt.plot(x_train, estimated_y)
-plt.plot(x_train, y_train, 'ro')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.tight_layout()
-plt.savefig('output.png')
-
+    plt.subplot(212)
+    plt.plot(x_train, regression_line)
+    plt.plot(x_train, y_train, 'ro')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.tight_layout()
+    plt.savefig('output.png')
