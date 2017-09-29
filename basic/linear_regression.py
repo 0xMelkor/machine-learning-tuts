@@ -6,7 +6,8 @@
  \__ \ || (_| | (__|   <  \__ \ | | | | | (_| \__ \ | | |  __/ |  \__ \
  |___/\__\__,_|\___|_|\_\ |___/_| |_| |_|\__,_|___/_| |_|\___|_|  |___/
                                                                        
-@author: Andrea Simeoni 29 set 2017                                                         
+@author: Andrea Simeoni 29 set 2017   
+https://github.com/insanediv/machine-learning-tuts/blob/master/basic/linear_regression.py
 """
 import os
 
@@ -17,7 +18,7 @@ import tensorflow as tf
 del os.environ['TCL_LIBRARY']
 
 
-def get_linear_samples(n_samples=100):
+def gen_linear_samples(n_samples=100):
     x = np.random.uniform(high=10, low=0, size=n_samples)
     y = 3.5 * x - 4 + np.random.normal(loc=0, scale=2, size=n_samples)
     return x, y
@@ -28,7 +29,7 @@ num_epochs = 1000
 num_samples = 100
 learning_rate = 0.01
 
-x_train, y_train = get_linear_samples(num_samples)
+x_train, y_train = gen_linear_samples(num_samples)
 
 # Graph input
 X = tf.placeholder(dtype=tf.float32, shape=num_samples)
