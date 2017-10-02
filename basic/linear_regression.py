@@ -52,21 +52,14 @@ train = optimizer.minimize(loss)
 init = tf.global_variables_initializer()
 with tf.Session() as session:
     session.run(init)
-    steps = dict()
-    steps['W'] = []
-    steps['b'] = []
 
     losses = []
 
     for k in range(num_epochs):
-        _W = session.run(W)
-        _b = session.run(b)
         _l = session.run(loss, feed_dict={X: x_train, Y: y_train})
         session.run(train, feed_dict={X: x_train, Y: y_train})
 
-        # Store learned params for plotting
-        steps['W'].append(_W)
-        steps['b'].append(_b)
+        # Store loss
         losses.append(_l)
 
         print("Current loss: %s" % _l)
