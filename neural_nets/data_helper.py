@@ -5,7 +5,7 @@ class DataHelper:
     def __init__(self, file_path):
         self.file_path = file_path
         self.next_batch = 1
-        self.dictionary = self._extract_dictionary()
+        self.dictionary = self._extract_char_dictionary()
         self.one_hot_dictionary = self.get_one_hot_dictionary()
         self.one_hot_data = self._load_onehot_data()
 
@@ -18,7 +18,6 @@ class DataHelper:
             result = self.one_hot_data[batch_size * self.next_batch:batch_size]
         else:
             self.next_batch += 1
-        print(self.next_batch)
         return list(result)
 
     def get_input_vector_size(self):
@@ -54,7 +53,7 @@ class DataHelper:
 
         return result
 
-    def _extract_dictionary(self):
+    def _extract_char_dictionary(self):
         """
         :return: List of characters in the data file
         """

@@ -1,3 +1,14 @@
+"""
+      _             _                              _                   
+     | |           | |                            | |                  
+  ___| |_ __ _  ___| | __  ___ _ __ ___   __ _ ___| |__   ___ _ __ ___ 
+ / __| __/ _` |/ __| |/ / / __| '_ ` _ \ / _` / __| '_ \ / _ \ '__/ __|
+ \__ \ || (_| | (__|   <  \__ \ | | | | | (_| \__ \ | | |  __/ |  \__ \
+ |___/\__\__,_|\___|_|\_\ |___/_| |_| |_|\__,_|___/_| |_|\___|_|  |___/
+
+@author: Andrea Simeoni 21 ott 2017   
+https://github.com/insanediv/machine-learning-tuts/blob/master/neural_nets/hello_lstm.py
+"""
 import tflearn
 from time import sleep
 from neural_nets.data_helper import DataHelper
@@ -5,17 +16,18 @@ from neural_nets.framing import frame_data
 
 file_path = 'raw_data/hello.txt'
 data_helper = DataHelper(file_path=file_path)
-one_hot_dict = data_helper.one_hot_dictionary;
+one_hot_dict = data_helper.one_hot_dictionary
 
 # model params
 time_steps = 3
 sample_length = data_helper.get_input_vector_size()
 
+# No framed data (chars sequence one-hot encoded)
 one_hot_train_data = data_helper.get_next_batch(batch_size=20)
-one_hot_test_data = data_helper.get_next_batch(batch_size=20)
-
+# Framed data one-hot encoded
 trainX, trainY = frame_data(dataset=one_hot_train_data, look_back=time_steps)
 
+# Recurrent Neural Network model
 net = tflearn.input_data(shape=[None, time_steps, sample_length],name='input')
 net = tflearn.lstm(net, 50, dropout=0.8)
 net = tflearn.fully_connected(net, sample_length, activation='softmax')
@@ -26,6 +38,7 @@ net = tflearn.regression(net, optimizer='adam', learning_rate=0.001,
 model = tflearn.DNN(net, tensorboard_verbose=0)
 model.fit(trainX, trainY, show_metric=True, n_epoch=400, batch_size=20)
 
+# Generate output sequences
 test_data = data_helper.interactive_input(input_len=time_steps)
 prediction = model.predict([test_data])
 pred_char, pred_one_hot = data_helper.get_prediction(prediction)
@@ -35,6 +48,6 @@ while True:
     test_data.append(pred_one_hot)
     prediction = model.predict([test_data])
     pred_char, pred_one_hot = data_helper.get_prediction(prediction)
-    print(pred_char)
-    sleep(0.2)
+    print(pred_char, end=' ', flush=True)
+    sleep(0.7)
 
