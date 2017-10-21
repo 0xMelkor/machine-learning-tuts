@@ -1,3 +1,14 @@
+"""
+      _             _                              _                   
+     | |           | |                            | |                  
+  ___| |_ __ _  ___| | __  ___ _ __ ___   __ _ ___| |__   ___ _ __ ___ 
+ / __| __/ _` |/ __| |/ / / __| '_ ` _ \ / _` / __| '_ \ / _ \ '__/ __|
+ \__ \ || (_| | (__|   <  \__ \ | | | | | (_| \__ \ | | |  __/ |  \__ \
+ |___/\__\__,_|\___|_|\_\ |___/_| |_| |_|\__,_|___/_| |_|\___|_|  |___/
+
+@author: Andrea Simeoni 21 ott 2017   
+https://github.com/insanediv/machine-learning-tuts/blob/master/neural_nets/data_helper.py
+"""
 import numpy as np
 
 
@@ -87,10 +98,17 @@ class DataHelper:
         return predicted_char, predicted_one_hot
 
     def interactive_input(self, input_len):
-        user_input = input('Insert %d characters \n' % input_len)
-        char_list = list(user_input)
+        user_msg = 'Insert %d characters among %s \n' % (input_len, self.dictionary)
+
         result = list()
-        one_hot_dict = self.get_one_hot_dictionary()
-        for characther in char_list:
-            result.append(one_hot_dict[characther])
+        while len(result) != input_len:
+            user_input = input(user_msg)
+            char_list = list(user_input)
+            if len(char_list) == input_len:
+                one_hot_dict = self.get_one_hot_dictionary()
+                for characther in char_list:
+                    try:
+                        result.append(one_hot_dict[characther])
+                    except KeyError:
+                        continue
         return result
