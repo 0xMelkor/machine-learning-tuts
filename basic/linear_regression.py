@@ -20,13 +20,13 @@ del os.environ['TCL_LIBRARY']
 
 def gen_linear_samples(n_samples=100):
     x = np.random.uniform(high=10, low=0, size=n_samples)
-    y = 3.5 * x - 4 + np.random.normal(loc=0, scale=2, size=n_samples)
+    y = 7 * x - 4 + np.random.normal(loc=0, scale=5, size=n_samples)
     return x, y
 
 
 # Parameters
 num_epochs = 1000
-num_samples = 100
+num_samples = 500
 learning_rate = 0.01
 
 x_train, y_train = gen_linear_samples(num_samples)

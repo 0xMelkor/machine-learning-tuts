@@ -32,6 +32,7 @@ def load_mnist_dataset():
 learning_rate = 0.5
 num_epochs = 1000
 batch_size = 100
+display_step = 5
 
 # Import data
 mnist = load_mnist_dataset()
@@ -66,9 +67,12 @@ with tf.Session() as session:
     for epoch in range(num_epochs):
         # Get next batch
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+
         # Get current loss for plotting
         _l = session.run(loss, feed_dict={x: batch_xs, y_: batch_ys})
-        losses.append(_l)
+        if (epoch + 1) % display_step == 0:
+            losses.append(_l)
+
         print("Current loss: %s" % _l)
         # Train to get better loss
         session.run(train, feed_dict={x: batch_xs, y_: batch_ys})

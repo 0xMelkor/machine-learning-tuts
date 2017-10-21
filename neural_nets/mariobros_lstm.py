@@ -3,7 +3,7 @@ from neural_nets.framing import series_to_supervised as frame_data
 from neural_nets.data_helper import DataHelper
 
 data_helper = DataHelper()
-one_hot_dict = data_helper.get_one_hot_dictionaries()
+one_hot_dict = data_helper.get_one_hot_dictionary()
 input_dim = data_helper.get_input_vector_size()
 
 # Network parameters

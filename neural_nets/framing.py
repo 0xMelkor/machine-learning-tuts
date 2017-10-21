@@ -1,7 +1,15 @@
 import numpy as np
 
 
-def frame_data(dataset, look_back=1):
+def frame_data(dataset, look_back=1, dropnan=True):
+    """
+    Data framing inspired to
+    https://machinelearningmastery.com/time-series-prediction-lstm-recurrent-neural-networks-python-keras/
+    :param dataset: set of sequenced data
+    :param look_back: how many timesteps to look backward
+    :param dropnan: because of shifting some rows have None objects. Set true to remove such rows
+    :return: 
+    """
     if type(dataset) is list:
         dataset = np.asarray(dataset)
     result = list()
@@ -22,12 +30,20 @@ def frame_data(dataset, look_back=1):
             tmp.append(result[list_index][el_index])
         columns.append(tmp)
 
-    return columns
+    if dropnan:
+        cleaned = []
+        for sample in columns:
+            if not None in sample:
+               cleaned.append(sample)
+        columns = cleaned
 
+    # Split input and output values
+    dataX = list()
+    dataY = list()
+    for sample in columns:
+        tmp = sample
+        dataY.append(tmp[-1])
+        tmp.pop()
+        dataX.append(tmp)
 
-x = frame_data(dataset=[1, 2, 3, 4, 5, 6, 7], look_back=1)
-print(x)
-
-x = frame_data(dataset=[[1,0],[0,1],[1,1], [1,1], [1,1]], look_back=1)
-print(x)
-
+    return dataX, dataY

@@ -6,15 +6,16 @@ class DataHelper:
         self.file_path = file_path
         self.next_batch = 1
         self.dictionary = self._extract_dictionary()
+        self.one_hot_dictionary = self.get_one_hot_dictionary()
         self.one_hot_data = self._load_onehot_data()
 
     def get_next_batch(self, batch_size=1):
-        start_index = batch_size*self.next_batch
+        start_index = batch_size * self.next_batch
         end_index = start_index + batch_size
         result = self.one_hot_data[start_index:end_index]
         if len(result) is 0:
             self.next_batch = 1
-            result = self.one_hot_data[batch_size*self.next_batch:batch_size]
+            result = self.one_hot_data[batch_size * self.next_batch:batch_size]
         else:
             self.next_batch += 1
         print(self.next_batch)
@@ -23,7 +24,7 @@ class DataHelper:
     def get_input_vector_size(self):
         return len(self.dictionary)
 
-    def get_one_hot_dictionaries(self):
+    def get_one_hot_dictionary(self):
         """
         :return: Dictionary of one-hot associations {'level-character': [0,1,0,0,0]}
         """
@@ -43,14 +44,13 @@ class DataHelper:
         """
         :return: nparray of one-hot encoded characters from the whole set of characters in the dataset
         """
-        data_dictionary = self.get_one_hot_dictionaries()
         result = list()
         with open(self.file_path, 'r') as f:
             for line in f:
                 line_chars = list(line)
                 for character in line_chars:
                     if character != '\n':
-                        result.append(data_dictionary[character])
+                        result.append(self.one_hot_dictionary[character])
 
         return result
 
@@ -64,3 +64,34 @@ class DataHelper:
                 level_charset |= set(line)
         level_charset.remove('\n')
         return list(level_charset)
+
+    def get_value_from_one_hot(self, one_hot):
+        val = one_hot.index(max(one_hot))
+        for key in self.one_hot_dictionary:
+            max_value = self.one_hot_dictionary[key].index(max(self.one_hot_dictionary[key]))
+            if val == max_value:
+                return key
+        return None
+
+    def get_values_from_one_hot_list(self, one_hot_values):
+        if type(one_hot_values) is np.ndarray:
+            one_hot_values = one_hot_values.tolist()
+        result = list()
+        for one_hot in one_hot_values:
+            result.append(self.get_value_from_one_hot(one_hot))
+
+        return result
+
+    def get_prediction(self, pred):
+        predicted_char = self.get_values_from_one_hot_list(pred)[0]
+        predicted_one_hot = self.one_hot_dictionary[predicted_char]
+        return predicted_char, predicted_one_hot
+
+    def interactive_input(self, input_len):
+        user_input = input('Insert %d characters \n' % input_len)
+        char_list = list(user_input)
+        result = list()
+        one_hot_dict = self.get_one_hot_dictionary()
+        for characther in char_list:
+            result.append(one_hot_dict[characther])
+        return result
